@@ -7,7 +7,7 @@ const BookMark = ({ status, ...rest }) => {
         </button>
     );
 };
-BookMark.propTypes = { status: PropTypes.string.isRequired };
+BookMark.propTypes = { status: PropTypes.bool };
 export default BookMark;
 
 // " + (status ? "-heart-fill 2rem" : "
