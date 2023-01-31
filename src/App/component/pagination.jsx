@@ -7,7 +7,7 @@ import PropTypes from "prop-types"; // impt
 // cpf ()=>{}
 const Pagination = ({ itemsCount, pageSize, onPageChange, currentPage }) => {
     // делим количество юсеров на 4 места и получаем страницы
-    const pageCount = Math.ceil(itemsCount / pageSize);
+    const pageCount = Math.ceil(itemsCount / pageSize); // делим с остатком
     if (pageCount === 1) return null; // если объектов на 1 страницу - она убирается
     const pages = _.range(1, pageCount + 1); // из чисел делаем массив, библиотека лодаш
     //   console.log(pages);

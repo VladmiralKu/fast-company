@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Users from "./component/users";
-import API from "./api/index";
+
+import api from "./api";
 
 function App() {
-    const [users, setUsers] = useState(API.users.fetchAll());
-    const handleDelete = (id) => {
-        const deleteUser = users.filter((c) => c._id !== id);
-        setUsers(deleteUser);
-    }; // вернет все кроме того что удалили, то есть не удаляет а вовращает оставшееся
-    const handleBookMark = (id) => {
+    const [users, setUsers] = useState();
+    useEffect(() => {
+        api.users.fetchAll().then((data) => setUsers(data));
+    }, []);
+    const handleDelete = (userId) => {
+        setUsers(users.filter((user) => user._id !== userId));
+    };
+    const handleToggleBookMark = (id) => {
         setUsers(
             users.map((user) => {
-                if (id === user._id) {
+                if (user._id === id) {
                     return { ...user, bookmark: !user.bookmark };
                 }
                 return user;
@@ -20,11 +23,13 @@ function App() {
     };
     return (
         <div>
-            <Users
-                onDelete={handleDelete}
-                users={users}
-                onToggleBookMark={handleBookMark}
-            />
+            {users && (
+                <Users
+                    onDelete={handleDelete}
+                    onToggleBookMark={handleToggleBookMark}
+                    users={users}
+                />
+            )}
         </div>
     );
 }

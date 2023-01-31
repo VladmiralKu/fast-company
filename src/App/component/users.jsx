@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
 import Pagination from "./pagination";
-import User from "./user";
+import UserTable from "./usersTable";
 import api from "../api";
 import { paginate } from "../utils/paginate";
 import PropTypes from "prop-types";
 import GroupList from "./groupList";
 import SearchStatus from "./searchStatus";
+import _ from "lodash";
 const Users = ({ users: allUsers, ...rest }) => {
-    const pageSize = 4; // мест на странице
+    const pageSize = 8; // мест на странице
     const [currentPage, setCurrentPage] = useState(1); // актив значок на выбранной странице
     const [professions, setProfessions] = useState(api.professions.fetchAll());
     const [selectedProf, useSelectedProf] = useState();
+    const [sortBy, setSortBy] = useState({ path: "name", order: "asc" }); // сортировка по имени/профессии
     useEffect(() => {
-        // console.log("send request");
         api.professions.fetchAll().then((data) => {
             setProfessions(data);
         });
@@ -26,18 +27,20 @@ const Users = ({ users: allUsers, ...rest }) => {
     }; // при клике получаем номер страницы
     const handleProfessionSelect = (item) => {
         useSelectedProf(item);
-        // console.log("item", item);
     };
-    // console.log("selectedProf", selectedProf);
-    console.log(
-        "allUsers",
-        allUsers.filter((user) => console.log(user.profession))
-    );
+    const handleSort = (item) => {
+        setSortBy(item);
+    };
     const filteredUsers = selectedProf
-        ? allUsers.filter((user) => user.profession === selectedProf)
+        ? allUsers.filter(
+              (user) =>
+                  JSON.stringify(user.profession) ===
+                  JSON.stringify(selectedProf)
+          )
         : allUsers;
     const count = filteredUsers.length; // колво пользователей
-    const userCrop = paginate(filteredUsers, currentPage, pageSize); // делим
+    const sortedUsers = _.orderBy(filteredUsers, [sortBy.path], [sortBy.order]); // задаем параметры через лодаш для сортировки по имени
+    const userCrop = paginate(sortedUsers, currentPage, pageSize); // делим
     const clearFilter = () => {
         useSelectedProf();
     };
@@ -61,24 +64,12 @@ const Users = ({ users: allUsers, ...rest }) => {
             <div className="d-flex flex-column">
                 <SearchStatus length={count} />
                 {count > 0 && (
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Имя</th>
-                                <th scope="col">Качества</th>
-                                <th scope="col">Профессия</th>
-                                <th scope="col">Встретился раз</th>
-                                <th scope="col">Оценка</th>
-                                <th scope="col">Избранное</th>
-                                <th />
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {userCrop.map((user) => (
-                                <User key={user._id} {...rest} {...user}></User>
-                            ))}
-                        </tbody>
-                    </table>
+                    <UserTable
+                        users={userCrop}
+                        onSort={handleSort}
+                        selectedSort={sortBy}
+                        {...rest}
+                    />
                 )}
                 <div className="d-flex justify-content-center">
                     <Pagination

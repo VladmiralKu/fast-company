@@ -2,7 +2,6 @@ import React from "react";
 import BookMark from "./bookmark";
 import PropTypes from "prop-types";
 import Qualitie from "./qulitie";
-// console.log(one);
 const User = (props) => {
     return (
         <>
